@@ -38,7 +38,7 @@ body {
 }
 
 .actor-suit {
-  width: 25%;
+  width: 26%;
   aspect-ratio: 355 / 443;
   left: 4.5%;
   bottom: 12.5%;
@@ -60,6 +60,24 @@ body {
   bottom: 8%;
 }
 
+.actor-seated {
+  z-index: 2;
+  width: 22%;
+  aspect-ratio: 320 / 280;
+  left: 70%;
+  bottom: 10%;
+}
+
+.actor-walker {
+  z-index: 3;
+  width: 9%;
+  aspect-ratio: 180 / 300;
+  left: 35%;
+  top: 47%;
+  transform-origin: 50% 92%;
+  animation: walker-route 13s linear infinite;
+}
+
 .artboard > img {
   display: block;
   width: 100%;
@@ -69,4 +87,44 @@ body {
 
 @keyframes sprite-strip {
   to { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes walker-route {
+  0% {
+    left: 35%;
+    top: 47%;
+    opacity: 0;
+    transform: rotate(2deg);
+  }
+
+  3% {
+    opacity: 1;
+  }
+
+  42% {
+    left: 51%;
+    top: 52%;
+    opacity: 1;
+    transform: rotate(2deg);
+  }
+
+  52% {
+    left: 56%;
+    top: 48%;
+    transform: rotate(-34deg);
+  }
+
+  97% {
+    left: 72%;
+    top: 34%;
+    opacity: 1;
+    transform: rotate(-34deg);
+  }
+
+  100% {
+    left: 76%;
+    top: 31%;
+    opacity: 0;
+    transform: rotate(-34deg);
+  }
 }
