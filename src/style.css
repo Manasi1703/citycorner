@@ -1,0 +1,72 @@
+:root { color-scheme: light; }
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-width: 0; min-height: 0; }
+
+body {
+  background: #c9b8ad;
+  overflow: auto;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.artboard {
+  width: min(1280px, calc(100vw - 64px));
+  border: 6px solid #000;
+  line-height: 0;
+  position: relative;
+}
+
+.actor {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.actor img {
+  width: var(--sprite-strip-width);
+  max-width: none;
+  height: 100%;
+  display: block;
+  animation: sprite-strip var(--sprite-loop-duration) var(--sprite-timing) infinite;
+  will-change: transform;
+}
+
+.actor-suit {
+  width: 25%;
+  aspect-ratio: 355 / 443;
+  left: 4.5%;
+  bottom: 12.5%;
+}
+
+.actor-floral {
+  z-index:1;
+  width: 31%;
+  aspect-ratio: 300 / 272;
+  left: -8%;
+  bottom: 8%;
+}
+
+.actor-dancer {
+  z-index: 2;
+  width: 28%;
+  aspect-ratio: 360 / 280;
+  left: 52%;
+  bottom: 8%;
+}
+
+.artboard > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: auto;
+}
+
+@keyframes sprite-strip {
+  to { transform: translate3d(-100%, 0, 0); }
+}
