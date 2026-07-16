@@ -8,14 +8,42 @@ const actors = [
   { name: "dancer", frameCount: 20, framesPerSecond: 8 },
 ];
 
+const spriteLoops = [];
+
 for (const config of actors) {
   const actor = document.querySelector(`[data-actor="${config.name}"]`);
   if (!actor) continue;
 
+  const strip = actor.querySelector("img");
+  if (!strip) continue;
+
   actor.style.setProperty("--sprite-strip-width", `${config.frameCount * 100}%`);
-  actor.style.setProperty("--sprite-loop-duration", `${config.frameCount / config.framesPerSecond}s`);
-  actor.style.setProperty("--sprite-timing", `steps(${config.frameCount})`);
+
+  gsap.set(strip, {
+    xPercent: 0,
+    force3D: true,
+  });
+
+  spriteLoops.push({
+    frameCount: config.frameCount,
+    framesPerSecond: config.framesPerSecond,
+    setFrame: gsap.quickSetter(strip, "xPercent"),
+    lastFrame: -1,
+    offset: Number(actor.dataset.offset || 0),
+  });
 }
+
+gsap.ticker.lagSmoothing(500, 16);
+
+gsap.ticker.add((time) => {
+  for (const loop of spriteLoops) {
+    const frame = Math.floor((time + loop.offset) * loop.framesPerSecond) % loop.frameCount;
+    if (frame === loop.lastFrame) continue;
+
+    loop.setFrame(-(frame * 100) / loop.frameCount);
+    loop.lastFrame = frame;
+  }
+});
 
 const cyclist = document.querySelector('[data-actor="cyclist"]');
 

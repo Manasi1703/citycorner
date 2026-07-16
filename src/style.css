@@ -41,7 +41,6 @@ body {
   max-width: none;
   height: 100%;
   display: block;
-  animation: sprite-strip var(--sprite-loop-duration) var(--sprite-timing) infinite;
   will-change: transform;
 }
 
@@ -89,8 +88,4 @@ body {
   width: 100%;
   height: auto;
   image-rendering: auto;
-}
-
-@keyframes sprite-strip {
-  to { transform: translate3d(-100%, 0, 0); }
 }
