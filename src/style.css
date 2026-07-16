@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --scene-margin: clamp(48px, 6vw, 80px);
+  --scene-margin: clamp(40px, 5vmin, 72px);
 }
 
 * { box-sizing: border-box; }
@@ -17,7 +17,11 @@ body {
 }
 
 .artboard {
-  width: min(1180px, calc(100vw - var(--scene-margin) - var(--scene-margin)));
+  width: min(
+    960px,
+    calc(150vw - var(--scene-margin) - var(--scene-margin)),
+    calc(150vh - var(--scene-margin) - var(--scene-margin))
+  );
   border: 6px solid #000;
   line-height: 0;
   position: relative;
