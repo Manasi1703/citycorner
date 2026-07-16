@@ -83,6 +83,14 @@ body {
   top: 62%;
 }
 
+.actor-cat {
+  z-index: 2;
+  width: 9%;
+  aspect-ratio: 234 / 281;
+  left: 82%;
+  top: 49%;
+}
+
 .artboard > img {
   display: block;
   width: 100%;

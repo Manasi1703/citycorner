@@ -6,6 +6,7 @@ const actors = [
   { name: "seated", frameCount: 20, framesPerSecond: 3 },
   { name: "cyclist", frameCount: 20, framesPerSecond: 6 },
   { name: "dancer", frameCount: 20, framesPerSecond: 8 },
+  { name: "cat", frameCount: 24, framesPerSecond: 6 },
 ];
 
 const spriteLoops = [];
