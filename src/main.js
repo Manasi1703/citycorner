@@ -21,17 +21,17 @@ const cyclist = document.querySelector('[data-actor="cyclist"]');
 
 if (cyclist) {
   gsap.set(cyclist, {
-    left: "2%",
-    top: "84%",
+    left: "-18%",
+    top: "104%",
     x: 0,
     y: 0,
     rotation: 0,
   });
 
   gsap.to(cyclist, {
-    left: "82%",
-    top: "10%",
-    duration: 10,
+    left: "125%",
+    top: "-26%",
+    duration: 16,
     ease: "none",
     repeat: -1,
   });

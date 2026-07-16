@@ -62,15 +62,15 @@ body {
 
 .actor-dancer {
   z-index: 2;
-  width: 28%;
+  width: 26%;
   aspect-ratio: 360 / 280;
-  left: 52%;
-  bottom: 8%;
+  left: 55%;
+  bottom: 7%;
 }
 
 .actor-seated {
   z-index: 2;
-  width: 22%;
+  width: 20%;
   aspect-ratio: 320 / 280;
   left: 70%;
   bottom: 10%;
@@ -78,9 +78,9 @@ body {
 
 .actor-cyclist {
   z-index: 1;
-  width: 25%;
+  width: 24%;
   aspect-ratio: 240 / 280;
-  left: 20%;
+  left: 18%;
   top: 62%;
 }
 
