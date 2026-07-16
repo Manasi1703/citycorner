@@ -1,4 +1,7 @@
-:root { color-scheme: light; }
+:root {
+  color-scheme: light;
+  --scene-margin: clamp(48px, 6vw, 80px);
+}
 
 * { box-sizing: border-box; }
 
@@ -10,11 +13,11 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 32px;
+  padding: var(--scene-margin);
 }
 
 .artboard {
-  width: min(1280px, calc(100vw - 64px));
+  width: min(1180px, calc(100vw - var(--scene-margin) - var(--scene-margin)));
   border: 6px solid #000;
   line-height: 0;
   position: relative;
