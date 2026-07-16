@@ -93,7 +93,6 @@ def main():
         dy = target_bottom - box[3]
         output = Image.new("RGBA", (FRAME_WIDTH, FRAME_HEIGHT), (255, 255, 255, 0))
         output.alpha_composite(frame, (dx, dy))
-        output.save(OUT_DIR / f"{NAME}-{index:02}.png")
         anchored.append(output)
 
     strip = Image.new("RGBA", (FRAME_WIDTH * len(SEQUENCE), FRAME_HEIGHT), (255, 255, 255, 0))

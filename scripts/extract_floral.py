@@ -224,9 +224,6 @@ for target_index in range(18, 24):
     target.alpha_composite(donor_crop, (0, 0))
     frames[target_index] = target
 
-for index, frame in enumerate(frames):
-    frame.save(OUT / f"{NAME}-{index:02}.png")
-
 strip = Image.new("RGBA", (FRAME_WIDTH * len(SEQUENCE), FRAME_HEIGHT), (255, 255, 255, 0))
 for strip_index, frame_index in enumerate(SEQUENCE):
     strip.alpha_composite(frames[frame_index], (strip_index * FRAME_WIDTH, 0))

@@ -224,7 +224,6 @@ for index, frame in enumerate(frames):
     canvas.alpha_composite(frame, (dx, dy))
     canvas = remove_leg_gap_patch(canvas)
     frames[index] = canvas
-    canvas.save(OUT / f"{NAME}-{index:02}.png")
 
 strip = Image.new("RGBA", (FRAME_WIDTH * len(SEQUENCE), FRAME_HEIGHT), (255, 255, 255, 0))
 for strip_index, frame_index in enumerate(SEQUENCE):

@@ -257,7 +257,6 @@ for index, cell in enumerate(cells):
     canvas.alpha_composite(frame, (dx, dy))
     canvas = remove_internal_white_patches(canvas)
     frames.append(canvas)
-    canvas.save(OUT / f"{NAME}-{index:02}.png")
 
 strip = Image.new("RGBA", (FRAME_WIDTH * len(frames), FRAME_HEIGHT), (255, 255, 255, 0))
 for index, frame in enumerate(frames):

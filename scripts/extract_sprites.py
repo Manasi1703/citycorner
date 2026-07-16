@@ -109,7 +109,6 @@ for index, (frame, box) in enumerate(zip(frames, bounds)):
     anchored = Image.new("RGBA", (frame_width, frame_height), (255, 255, 255, 0))
     anchored.alpha_composite(frame, (dx + nudge_x, dy + nudge_y))
     frames[index] = anchored
-    anchored.save(OUT / f"suit-{index:02}.png")
 
 strip = Image.new("RGBA", (frame_width * len(STRIP_SEQUENCE), frame_height), (255, 255, 255, 0))
 for strip_index, frame_index in enumerate(STRIP_SEQUENCE):
