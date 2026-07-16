@@ -25,6 +25,7 @@ body {
   border: 6px solid #000;
   line-height: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .actor {
@@ -73,6 +74,14 @@ body {
   aspect-ratio: 320 / 280;
   left: 70%;
   bottom: 10%;
+}
+
+.actor-cyclist {
+  z-index: 1;
+  width: 25%;
+  aspect-ratio: 240 / 280;
+  left: 20%;
+  top: 62%;
 }
 
 .artboard > img {
