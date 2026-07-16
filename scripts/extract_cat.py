@@ -13,6 +13,7 @@ FRAME_WIDTH = 234
 FRAME_HEIGHT = 281
 THRESHOLD = 244
 EXPECTED_FRAMES = 24
+SEQUENCE = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1]
 
 
 def transparentize_paper(image):
@@ -25,6 +26,20 @@ def transparentize_paper(image):
             alpha = 0 if source_alpha == 0 or lightness > THRESHOLD else max(0, min(255, int((THRESHOLD - lightness) * 23)))
             pixels[x, y] = (r, g, b, alpha)
     return image
+
+
+def lower_body_anchor_x(image):
+    pixels = image.load()
+    xs = []
+    for y in range(round(image.height * 0.54), image.height):
+        for x in range(round(image.width * 0.66)):
+            r, g, b, a = pixels[x, y]
+            if a > 80 and r < 90 and g < 90 and b < 90:
+                xs.append(x)
+    if not xs:
+        return None
+    xs.sort()
+    return xs[len(xs) // 2]
 
 
 def composite_centered(canvas, crop):
@@ -65,22 +80,25 @@ def main():
     if any(box is None for box in bounds):
         raise SystemExit("At least one cat spritesheet frame is empty.")
 
-    target_center_x = round(sum((box[0] + box[2]) / 2 for box in bounds) / len(bounds))
+    anchors = [lower_body_anchor_x(frame) for frame in frames]
+    if any(anchor is None for anchor in anchors):
+        raise SystemExit("Could not find a lower-body anchor for at least one cat frame.")
+    target_anchor_x = sorted(anchors)[len(anchors) // 2]
     target_bottom = max(box[3] for box in bounds)
     anchored = []
 
     for index, frame in enumerate(frames):
         box = bounds[index]
-        dx = round(target_center_x - (box[0] + box[2]) / 2)
+        dx = round(target_anchor_x - anchors[index])
         dy = target_bottom - box[3]
         output = Image.new("RGBA", (FRAME_WIDTH, FRAME_HEIGHT), (255, 255, 255, 0))
         output.alpha_composite(frame, (dx, dy))
         output.save(OUT_DIR / f"{NAME}-{index:02}.png")
         anchored.append(output)
 
-    strip = Image.new("RGBA", (FRAME_WIDTH * len(anchored), FRAME_HEIGHT), (255, 255, 255, 0))
-    for index, frame in enumerate(anchored):
-        strip.alpha_composite(frame, (index * FRAME_WIDTH, 0))
+    strip = Image.new("RGBA", (FRAME_WIDTH * len(SEQUENCE), FRAME_HEIGHT), (255, 255, 255, 0))
+    for strip_index, frame_index in enumerate(SEQUENCE):
+        strip.alpha_composite(anchored[frame_index], (strip_index * FRAME_WIDTH, 0))
     strip.save(OUT_DIR / f"{NAME}-strip.png")
 
 

@@ -75,6 +75,14 @@ body {
   bottom: 10%;
 }
 
+.actor-cat {
+  z-index: 0;
+  width: 9%;
+  aspect-ratio: 234 / 281;
+  left: 60%;
+  top: 30%;
+}
+
 .actor-cyclist {
   z-index: 1;
   width: 24%;
@@ -83,13 +91,7 @@ body {
   top: 62%;
 }
 
-.actor-cat {
-  z-index: 2;
-  width: 9%;
-  aspect-ratio: 234 / 281;
-  left: 82%;
-  top: 49%;
-}
+
 
 .artboard > img {
   display: block;
