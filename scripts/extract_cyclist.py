@@ -176,6 +176,60 @@ def enhance_and_scale(image, scale):
     return frame.filter(ImageFilter.UnsharpMask(radius=0.35, percent=100, threshold=1))
 
 
+def is_internal_residual(pixel):
+    r, g, b, a = pixel
+    return a > 180 and min(r, g, b) > 205 and max(r, g, b) - min(r, g, b) < 45
+
+
+def remove_internal_white_patches(image):
+    image = image.convert("RGBA")
+    pixels = image.load()
+    width, height = image.size
+    visited = set()
+
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in visited or not is_internal_residual(pixels[x, y]):
+                continue
+
+            stack = [(x, y)]
+            visited.add((x, y))
+            points = []
+
+            while stack:
+                cx, cy = stack.pop()
+                points.append((cx, cy))
+
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if (
+                        0 <= nx < width
+                        and 0 <= ny < height
+                        and (nx, ny) not in visited
+                        and is_internal_residual(pixels[nx, ny])
+                    ):
+                        visited.add((nx, ny))
+                        stack.append((nx, ny))
+
+            xs = [point[0] for point in points]
+            ys = [point[1] for point in points]
+            box = (min(xs), min(ys), max(xs) + 1, max(ys) + 1)
+            area = len(points)
+            center_x = (box[0] + box[2]) / 2
+            center_y = (box[1] + box[3]) / 2
+
+            # Remove only the small enclosed paper/checkerboard islands around
+            # the torso, handlebar, and bike-gap area. Keep the cyclist's white
+            # shirt, shoes, and wheel interiors.
+            is_bike_gap_patch = 40 <= area <= 520 and 112 <= center_x <= 174 and 116 <= center_y <= 198
+            is_hand_gap_patch = 180 <= area <= 380 and 138 <= center_x <= 182 and 94 <= center_y <= 132
+
+            if is_bike_gap_patch or is_hand_gap_patch:
+                for px, py in points:
+                    pixels[px, py] = (255, 255, 255, 0)
+
+    return image
+
+
 if not SOURCE.exists():
     raise SystemExit(f"Missing cyclist spritesheet: {SOURCE}")
 
@@ -201,6 +255,7 @@ for index, cell in enumerate(cells):
     dy = TARGET_BOTTOM - box[3]
     canvas = Image.new("RGBA", (FRAME_WIDTH, FRAME_HEIGHT), (255, 255, 255, 0))
     canvas.alpha_composite(frame, (dx, dy))
+    canvas = remove_internal_white_patches(canvas)
     frames.append(canvas)
     canvas.save(OUT / f"{NAME}-{index:02}.png")
 
