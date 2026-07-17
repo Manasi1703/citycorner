@@ -4,6 +4,7 @@ const actors = [
   { name: "suit", frameCount: 14, framesPerSecond: 3 },
   { name: "floral", frameCount: 46, framesPerSecond: 5 },
   { name: "host", frameCount: 46, framesPerSecond: 8 },
+  { name: "lemonade", frameCount: 24, framesPerSecond: 6 },
   { name: "seated", frameCount: 20, framesPerSecond: 3 },
   { name: "cyclist", frameCount: 20, framesPerSecond: 6 },
   { name: "dancer", frameCount: 20, framesPerSecond: 8 },

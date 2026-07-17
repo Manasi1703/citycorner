@@ -67,6 +67,14 @@ body {
   bottom: 30%;
 }
 
+.actor-lemonade {
+  z-index: 1;
+  width: 25%;
+  aspect-ratio: 300 / 360;
+  left: 58.5%;
+  top: 6.25%;
+}
+
 .actor-dancer {
   z-index: 2;
   width: 28%;
