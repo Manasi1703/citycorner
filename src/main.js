@@ -3,10 +3,11 @@ import { gsap } from "gsap";
 const actors = [
   { name: "suit", frameCount: 14, framesPerSecond: 3 },
   { name: "floral", frameCount: 46, framesPerSecond: 5 },
+  { name: "host", frameCount: 28, framesPerSecond: 8 },
   { name: "seated", frameCount: 20, framesPerSecond: 3 },
   { name: "cyclist", frameCount: 20, framesPerSecond: 6 },
   { name: "dancer", frameCount: 20, framesPerSecond: 8 },
-  { name: "cat", frameCount: 10, framesPerSecond: 6 },
+  { name: "cat", frameCount: 8, framesPerSecond: 5 },
 ];
 
 const spriteLoops = [];

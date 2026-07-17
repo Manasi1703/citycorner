@@ -59,6 +59,14 @@ body {
   bottom: 8%;
 }
 
+.actor-host {
+  z-index: 1;
+  width: 16%;
+  aspect-ratio: 300 / 370;
+  left: 27%;
+  bottom: 32%;
+}
+
 .actor-dancer {
   z-index: 2;
   width: 28%;
@@ -77,9 +85,9 @@ body {
 
 .actor-cat {
   z-index: 0;
-  width: 9%;
-  aspect-ratio: 234 / 281;
-  left: 60%;
+  width: 11.5%;
+  aspect-ratio: 300 / 281;
+  left: 58.8%;
   top: 30%;
 }
 
