@@ -13,7 +13,7 @@ FRAME_WIDTH = 300
 FRAME_HEIGHT = 281
 THRESHOLD = 244
 EXPECTED_FRAMES = 24
-SEQUENCE = [0, 1, 2, 3, 4, 3, 2, 1]
+SEQUENCE = [0, 1, 2, 1]
 
 
 def transparentize_paper(image):

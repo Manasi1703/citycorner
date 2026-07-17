@@ -61,10 +61,10 @@ body {
 
 .actor-host {
   z-index: 1;
-  width: 16%;
-  aspect-ratio: 300 / 370;
-  left: 27%;
-  bottom: 32%;
+  width: 18.7%;
+  aspect-ratio: 360 / 500;
+  left: 23%;
+  bottom: 30%;
 }
 
 .actor-dancer {
@@ -85,10 +85,10 @@ body {
 
 .actor-cat {
   z-index: 0;
-  width: 11.5%;
+  width: 9%;
   aspect-ratio: 300 / 281;
-  left: 58.8%;
-  top: 30%;
+  left: 32%;
+  bottom: 32%;
 }
 
 .actor-cyclist {

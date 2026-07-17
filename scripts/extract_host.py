@@ -5,15 +5,18 @@ from collections import deque
 from PIL import Image
 
 
-SOURCE = Path("/Users/Manasi/Downloads/ChatGPT Image Jul 16, 2026, 08_10_11 PM.png")
+SOURCE = Path("/Users/Manasi/Downloads/ChatGPT Image Jul 17, 2026, 11_55_23 AM.png")
 OUT_DIR = Path("public/assets/characters")
 NAME = "host"
-COLS = 5
-ROWS = 4
-FRAME_WIDTH = 300
-FRAME_HEIGHT = 370
-THRESHOLD = 244
-USE_FRAMES = list(range(15))
+COLS = 8
+ROWS = 3
+FRAME_WIDTH = 360
+FRAME_HEIGHT = 500
+THRESHOLD = 230
+TARGET_HEIGHT = 420
+BOTTOM_BLEED = 28
+ROTATION_DEGREES = 0
+USE_FRAMES = list(range(24))
 SEQUENCE = USE_FRAMES + USE_FRAMES[-2:0:-1]
 
 
@@ -53,6 +56,42 @@ def transparentize_paper(image):
             if source_alpha == 0:
                 continue
             pixels[x, y] = (r, g, b, source_alpha)
+    return image
+
+
+def remove_edge_halo(image):
+    image = image.convert("RGBA")
+    pixels = image.load()
+    original = image.copy().load()
+
+    for y in range(image.height):
+        for x in range(image.width):
+            r, g, b, a = original[x, y]
+            if a == 0:
+                continue
+
+            touches_transparency = False
+            for nx in range(max(0, x - 1), min(image.width, x + 2)):
+                for ny in range(max(0, y - 1), min(image.height, y + 2)):
+                    if original[nx, ny][3] == 0:
+                        touches_transparency = True
+                        break
+                if touches_transparency:
+                    break
+
+            if not touches_transparency:
+                continue
+
+            minimum = min(r, g, b)
+            maximum = max(r, g, b)
+            saturation = maximum - minimum
+
+            if minimum > 248:
+                pixels[x, y] = (255, 255, 255, 0)
+            elif minimum > 236 and saturation < 18:
+                fade = max(0, min(255, int((248 - minimum) * 18)))
+                pixels[x, y] = (r, g, b, min(a, fade))
+
     return image
 
 
@@ -146,6 +185,80 @@ def remove_paper_specks(image):
     return image
 
 
+def connected_components(image):
+    alpha = image.getchannel("A")
+    alpha_pixels = alpha.load()
+    visited = set()
+    components = []
+
+    for y in range(image.height):
+        for x in range(image.width):
+            if (x, y) in visited or not alpha_pixels[x, y]:
+                continue
+
+            queue = deque([(x, y)])
+            visited.add((x, y))
+            component = []
+
+            while queue:
+                px, py = queue.popleft()
+                component.append((px, py))
+                for nx, ny in ((px + 1, py), (px - 1, py), (px, py + 1), (px, py - 1)):
+                    if (
+                        0 <= nx < image.width
+                        and 0 <= ny < image.height
+                        and (nx, ny) not in visited
+                        and alpha_pixels[nx, ny]
+                    ):
+                        visited.add((nx, ny))
+                        queue.append((nx, ny))
+
+            xs = [point[0] for point in component]
+            ys = [point[1] for point in component]
+            components.append(
+                {
+                    "points": component,
+                    "area": len(component),
+                    "box": (min(xs), min(ys), max(xs) + 1, max(ys) + 1),
+                }
+            )
+
+    return components
+
+
+def prune_neighbor_spill(image):
+    image = image.convert("RGBA")
+    pixels = image.load()
+    components = connected_components(image)
+    if not components:
+        return image
+
+    main = max(components, key=lambda component: component["area"])
+    left, top, right, bottom = main["box"]
+    keep_left = left - 8
+    keep_top = top - 36
+    keep_right = right + 36
+    keep_bottom = bottom + 36
+
+    for component in components:
+        if component is main:
+            continue
+
+        c_left, c_top, c_right, c_bottom = component["box"]
+        center_x = (c_left + c_right) / 2
+        center_y = (c_top + c_bottom) / 2
+        near_main = keep_left <= center_x <= keep_right and keep_top <= center_y <= keep_bottom
+        likely_fan_motion_mark = component["area"] < 260 and c_top < 145 and (right - 80) <= center_x <= (right + 45)
+
+        if near_main or likely_fan_motion_mark:
+            continue
+
+        for px, py in component["points"]:
+            pixels[px, py] = (255, 255, 255, 0)
+
+    return image
+
+
 def lower_body_anchor_x(image):
     pixels = image.load()
     xs = []
@@ -174,6 +287,25 @@ def composite_centered(canvas, crop):
     canvas.alpha_composite(crop.crop((source_left, source_top, source_right, source_bottom)), (max(0, x), max(0, y)))
 
 
+def resize_to_target_height(image):
+    box = alpha_bbox(image)
+    image = image.crop(box)
+    source_height = box[3] - box[1]
+    scale = TARGET_HEIGHT / source_height
+    width = max(1, round(image.width * scale))
+    height = max(1, round(image.height * scale))
+    return image.resize((width, height), Image.Resampling.LANCZOS)
+
+
+def rotate_on_canvas(image):
+    return image.rotate(
+        ROTATION_DEGREES,
+        resample=Image.Resampling.BICUBIC,
+        expand=False,
+        fillcolor=(255, 255, 255, 0),
+    )
+
+
 def main():
     if not SOURCE.exists():
         raise SystemExit(f"Missing host spritesheet: {SOURCE}")
@@ -187,23 +319,25 @@ def main():
             left = round(col * sheet.width / COLS)
             right = round((col + 1) * sheet.width / COLS)
             top = round(row * sheet.height / ROWS)
-            bottom = round((row + 1) * sheet.height / ROWS)
+            bottom = min(sheet.height, round((row + 1) * sheet.height / ROWS) + BOTTOM_BLEED)
             crop = sheet.crop((left, top, right, bottom))
             canvas = Image.new("RGBA", (FRAME_WIDTH, FRAME_HEIGHT), (255, 255, 255, 0))
             composite_centered(canvas, crop)
             frame = transparentize_paper(canvas)
             frame = remove_top_spill_components(frame, row * COLS + col)
             frame = remove_paper_specks(frame)
+            frame = prune_neighbor_spill(frame)
+            frame = remove_edge_halo(frame)
             frames.append(frame)
 
-    usable = [frames[index] for index in USE_FRAMES]
+    usable = [resize_to_target_height(frames[index]) for index in USE_FRAMES]
     boxes = [alpha_bbox(frame) for frame in usable]
     anchors = [lower_body_anchor_x(frame) for frame in usable]
     if any(anchor is None for anchor in anchors):
         raise SystemExit("Could not find a lower-body anchor for at least one host frame.")
 
-    target_anchor_x = sorted(anchors)[len(anchors) // 2]
-    target_bottom = max(box[3] for box in boxes)
+    target_anchor_x = round(FRAME_WIDTH * 0.42)
+    target_bottom = FRAME_HEIGHT - 40
     anchored = []
 
     for index, frame in enumerate(usable):
@@ -212,7 +346,7 @@ def main():
         dy = target_bottom - box[3]
         output = Image.new("RGBA", (FRAME_WIDTH, FRAME_HEIGHT), (255, 255, 255, 0))
         output.alpha_composite(frame, (dx, dy))
-        anchored.append(output)
+        anchored.append(rotate_on_canvas(output))
 
     strip = Image.new("RGBA", (FRAME_WIDTH * len(SEQUENCE), FRAME_HEIGHT), (255, 255, 255, 0))
     for strip_index, frame_index in enumerate(SEQUENCE):
