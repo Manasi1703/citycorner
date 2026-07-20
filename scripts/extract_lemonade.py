@@ -13,7 +13,7 @@ ROWS = 4
 FRAME_WIDTH = 300
 FRAME_HEIGHT = 360
 TARGET_HEIGHT = 250
-ROTATION_DEGREES = -3
+ROTATION_DEGREES = 0
 TOP_BLEED = 48
 BOTTOM_BLEED = 12
 WALL_ANCHOR_TOP = 50
@@ -108,6 +108,46 @@ def keep_main_component(image):
             continue
         for px, py in component:
             if (px, py) not in keep:
+                pixels[px, py] = (255, 255, 255, 0)
+
+    return image
+
+
+def remove_enclosed_light_background(image):
+    image = image.convert("RGBA")
+    pixels = image.load()
+    visited = set()
+
+    def is_light_background(x, y):
+        r, g, b, a = pixels[x, y]
+        return a > 0 and min(r, g, b) > 220 and max(r, g, b) - min(r, g, b) < 20
+
+    for y in range(image.height):
+        for x in range(image.width):
+            if (x, y) in visited or not is_light_background(x, y):
+                continue
+
+            queue = deque([(x, y)])
+            visited.add((x, y))
+            component = []
+
+            while queue:
+                px, py = queue.popleft()
+                component.append((px, py))
+                for nx, ny in ((px + 1, py), (px - 1, py), (px, py + 1), (px, py - 1)):
+                    if (
+                        0 <= nx < image.width
+                        and 0 <= ny < image.height
+                        and (nx, ny) not in visited
+                        and is_light_background(nx, ny)
+                    ):
+                        visited.add((nx, ny))
+                        queue.append((nx, ny))
+
+            if len(component) < 18:
+                continue
+
+            for px, py in component:
                 pixels[px, py] = (255, 255, 255, 0)
 
     return image
@@ -215,6 +255,7 @@ def main():
                 ),
             )
             frame = remove_checker_background(frame)
+            frame = remove_enclosed_light_background(frame)
             frame = keep_main_component(frame)
             frame = remove_edge_halo(frame)
             extracted.append(frame)

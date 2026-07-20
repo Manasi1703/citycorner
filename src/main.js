@@ -4,7 +4,7 @@ const actors = [
   { name: "suit", frameCount: 14, framesPerSecond: 3 },
   { name: "floral", frameCount: 46, framesPerSecond: 5 },
   { name: "host", frameCount: 46, framesPerSecond: 8 },
-  { name: "lemonade", frameCount: 24, framesPerSecond: 6 },
+  { name: "lemonade", frameCount: 24, framesPerSecond: 6, steppedTween: true },
   { name: "seated", frameCount: 20, framesPerSecond: 3 },
   { name: "cyclist", frameCount: 20, framesPerSecond: 6 },
   { name: "dancer", frameCount: 20, framesPerSecond: 8 },
@@ -26,6 +26,16 @@ for (const config of actors) {
     xPercent: 0,
     force3D: true,
   });
+
+  if (config.steppedTween) {
+    gsap.to(strip, {
+      xPercent: -((config.frameCount - 1) * 100) / config.frameCount,
+      duration: config.frameCount / config.framesPerSecond,
+      ease: `steps(${config.frameCount - 1})`,
+      repeat: -1,
+    });
+    continue;
+  }
 
   spriteLoops.push({
     frameCount: config.frameCount,
